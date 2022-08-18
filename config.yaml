@@ -1,0 +1,15 @@
+proxy:
+  host: 127.0.0.1
+  port: 10809
+    
+download:
+  path: C:/ELOI/pixiv/keyname/
+  singlePath: C:/ELOI/pixiv/single/
+
+upload:
+  endPoint: 81.69.203.181:9000
+  accessKeyID: "yfaimisaka"
+  secretAccessKey: "yfaimisaka"
+  useSSL: false
+  bucketName: pixiv
+  
