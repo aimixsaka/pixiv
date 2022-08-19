@@ -3,7 +3,7 @@ package pixiv
 import (
 	"compress/gzip"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -15,14 +15,22 @@ type user struct {
 	userId string
 }
 
+// Constructor of userId of pictures.
+// userId -id of the user.
 func User(userId string) *user {
 	u := new(user)
-	u.baseURL = "https://www.pixiv.net/ajax/user/%s/profile/all"
+	u.rname = "user"
 	u.log = myLog.WithField("place", "user")
+	u.baseURL = "https://www.pixiv.net/ajax/user/%s/profile/all"
+	u.userId = userId
+	u.savePath = globalConfig.GetString("download.user.path")
+	u.defaultName()
 	return u
 
 }
 
+// Set dir name.
+// Default is userid
 func (u *user) Name(name string) *user {
 	u.fileDir = name
 	return u
@@ -39,6 +47,10 @@ func (u *user) Download() {
 
 func (u *user) Upload() {
 	u.upLoadImg(u.getImgUrls(u.getIds()))
+}
+
+func (u *user) defaultName() {
+	u.fileDir = u.userId
 }
 
 func (u *user) getIds() chan string {
@@ -65,7 +77,7 @@ func (u *user) getIds() chan string {
 
 	reader, _ := gzip.NewReader(res.Body)
 	defer res.Body.Close()
-	content, err := ioutil.ReadAll(reader)
+	content, err := io.ReadAll(reader)
 	if err != nil {
 		u.log.WithError(err).Fatalln("Fail to read response")
 	}
@@ -77,12 +89,13 @@ func (u *user) getIds() chan string {
 	if u.num > idNum {
 		log.Fatalf("Total works in id=%s is: %d, while got %d\n", u.userId, idNum, u.num)
 	}
+	keys := jsoniter.Get(content, "body").Get("illusts").Keys()
 
 	go func() {
 		for i := 0; i < u.num; i++ {
-			keys := jsoniter.Get(content, "body").Get("illusts").Keys()
 			ids <- keys[i]
 		}
+		close(ids)
 	}()
 	return ids
 }

@@ -12,26 +12,53 @@ import (
 type rank struct {
 	pixiv
 	num int
+	cookie string
 }
 
+// Constructor of rank today.
 func Rank() *rank {
 	r := new(rank)
+	r.rname = "rank"
 	r.log = myLog.WithField("place", "rank")
 	r.baseURL = "https://www.pixiv.net/ajax/top/illust"
 	r.savePath = globalConfig.GetString("download.rank.path")
 	return r
 }
 
+// Set cookie (necessary).
+// cookie -cookie in request header.
+func (r *rank) Cookie(cookie string) *rank {
+	r.cookie = cookie
+	return r
+}
+
+// Num of picture to get.
+// default 100
 func (r *rank) Num(num int) *rank {
+	if r.cookie == "" {
+		r.log.Fatalln("cookie is null, please use Cookie method to set cookie")
+	}
 	r.num = num
 	return r
 }
 
 func (r *rank) DownLoad() {
+	if r.num < 0 {
+		r.log.Fatalln("Please give a number > 0")
+	}
+	if r.num == 0 {
+		r.num = 100
+	}
 	r.downLoadImg(r.getImgUrls(r.getIds()))
 }
 
 func (r *rank) Upload() {
+	if r.num < 0 {
+		r.log.Fatalln("Please give a number > 0")
+	}
+	if r.num == 0 {
+		r.num = 100
+	}
 	r.upLoadImg(r.getImgUrls(r.getIds()))
 }
 
@@ -48,6 +75,7 @@ func (r *rank) getIds() chan string {
 	req.URL.RawQuery = q.Encode()
 
 	setHeader(req)
+	req.Header.Set("cookie", r.cookie)
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -55,6 +83,9 @@ func (r *rank) getIds() chan string {
 	}
 
 	if code := res.StatusCode; code != 200 {
+		if code == 400 {
+			r.log.Fatalln("Cookie Error, please use Cookie to set cookie")
+		}
 		r.log.Fatalf("Response Code=%d", res.StatusCode)
 	}
 

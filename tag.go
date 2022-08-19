@@ -15,12 +15,16 @@ type tag struct {
 	tagName string
 }
 
+// Constructor of tag of pictures.
+// tagName -name of tag, can't be multi.
 func Tag(tagName string) *tag {
 	t := new(tag)
+	t.rname = "tag"
+	t.log = myLog.WithField("place", "tag")
 	t.savePath = globalConfig.GetString("download.tag.path")
 	t.fileDir = tagName
 	t.tagName = tagName
-	t.log = myLog.WithField("place", "tag")
+	t.baseURL = "https://www.pixiv.net/ajax/search/artworks/%s"
 	return t
 }
 
@@ -31,6 +35,10 @@ func (t *tag) Num(num int) *tag {
 
 func (t *tag) Download() {
 	t.downLoadImg(t.getImgUrls(t.getIds()))
+}
+
+func (t *tag) Upload() {
+	t.upLoadImg(t.getImgUrls(t.getIds()))
 }
 
 func (t *tag) getIds() chan string {

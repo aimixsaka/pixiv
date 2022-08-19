@@ -15,25 +15,39 @@ type keyWord struct {
 	keyWord string
 }
 
+// Constructor of keyword of pictures
+// word -keyword to search.
 func KeyWord(word string) *keyWord {
 	k := new(keyWord)
+	k.rname ="keyword"
 	k.log = myLog.WithField("place", "keyWord")
 	k.baseURL = "https://www.pixiv.net/ajax/search/artworks/%s"
+	k.savePath = globalConfig.GetString("download.keyword.path")
 	k.keyWord = word
 	k.fileDir = word
 	return k
 }
 
+// Set num of pictures.
 func (k *keyWord) Num(num int) *keyWord {
+	if num <= 0 {
+		k.log.Fatalln("Please give a number > 0")
+	}
 	k.num = num
 	return k
 }
 
 func (k *keyWord) Download() {
+	if k.num == 0 {
+		k.log.Fatalln("Please set num before download")
+	}
 	k.downLoadImg(k.getImgUrls(k.getIds()))
 }
 
 func (k *keyWord) Upload() {
+	if k.num == 0 {
+		k.log.Fatalln("Please set num before download")
+	}
 	k.upLoadImg(k.getImgUrls(k.getIds()))
 }
 

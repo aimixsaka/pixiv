@@ -4,18 +4,21 @@ proxy:
     
 download:
   single: 
-    path:
+    path: "C:\\ELOI\\pixiv\\single"
   keyword:
-    path:
+    path: "C:\\ELOI\\pixiv\\keyname"
   rank:
-    path:
+    path: "C:\\ELOI\\pixiv\\rank"
   tag:
-    path:
+    path: "C:\\ELOI\\pixiv\\tag"
+  user:
+    path: "C:\\ELOI\\pixiv\\user"
 
 upload:
-  endPoint: 81.69.203.181:9000
-  accessKeyID: "yfaimisaka"
-  secretAccessKey: "yfaimisaka"
+  use: true 
+  endPoint: xxxxxxxxxxxxx:9000
+  accessKeyID: xxxxxxxxxx
+  secretAccessKey: xxxxxxxxxx
   useSSL: false
   bucketName: pixiv
   

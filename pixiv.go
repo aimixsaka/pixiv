@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"runtime"
 	"strconv"
 	"sync"
 
@@ -20,6 +21,8 @@ type pixiv struct {
 	log      *logrus.Entry
 	savePath string
 	fileDir  string
+	// real struct name
+	rname string
 }
 
 func (p *pixiv) getImgUrls(ids chan string) chan string {
@@ -56,7 +59,7 @@ func (p *pixiv) getImgUrls(ids chan string) chan string {
 				p.log.WithError(err).Fatalf("Fail to get url of id=%s", id)
 			}
 
-			p.log.Infof("Got work that id is %s\n", id)
+			p.log.Infof("Got work that id is %s", id)
 			imgUrls <- u
 
 			urlsChan <- 1
@@ -72,9 +75,13 @@ func (p *pixiv) getImgUrls(ids chan string) chan string {
 	return imgUrls
 }
 
+// Now only support to upload to minio.
+// Default save path is bucket/pixiv/xxx, where
+// xxx is single/rank/tag ...
 func (p *pixiv) upLoadImg(imgUrls chan string) {
 	minioClient := initMinio()
 	bucketName := globalConfig.GetString("upload.bucketName")
+	fmt.Println(bucketName)
 	var count int
 	var imgsCount int
 	imgsChan := make(chan int)
@@ -93,7 +100,7 @@ func (p *pixiv) upLoadImg(imgUrls chan string) {
 			}
 			defer res.Body.Close()
 
-			name := p.fileDir + strconv.Itoa(count) + url[len(url)-4:]
+			name :=  "/" + "pixiv" + "/" + p.rname + "/" + strconv.Itoa(count) + url[len(url)-4:]
 			contentType := res.Header.Get("content-type")
 			n, err := minioClient.PutObject(bucketName, name, res.Body, res.ContentLength, minio.PutObjectOptions{ContentType: contentType})
 			if n == 0 || err != nil {
@@ -110,18 +117,25 @@ func (p *pixiv) upLoadImg(imgUrls chan string) {
 	for ; imgsCount > 0; imgsCount-- {
 		<-imgsChan
 	}
-	p.log.Infof("Total Uploaded: %d pictures\n", count)
+	p.log.Infof("Total Uploaded: %d pictures", count)
 }
 
 func (p *pixiv) downLoadImg(imgUrls chan string) {
-	if ok, _ := pathExists(p.savePath + p.fileDir); !ok {
-		err := os.Mkdir(p.savePath+p.fileDir, 0644)
+	var wg sync.WaitGroup
+	var count int
+	var sep string // seperator -depends on os(windows/linux)
+	sysType := runtime.GOOS
+	if sysType == "linux" {
+		sep = "/"
+	} else if sysType == "windows" {
+		sep = "\\"	
+	}
+	if ok, _ := pathExists(p.savePath + sep + p.fileDir); !ok {
+		err := os.Mkdir(p.savePath + sep + p.fileDir, 0644)
 		if err != nil {
 			p.log.WithError(err).Fatalf("Fail to create dir: %s", p.savePath+p.fileDir)
 		}
 	}
-	var wg sync.WaitGroup
-	var count int
 	for imgUrl := range imgUrls {
 		wg.Add(1)
 		count++
@@ -144,7 +158,8 @@ func (p *pixiv) downLoadImg(imgUrls chan string) {
 				p.log.WithError(err).Fatalln("Fail to read response")
 			}
 
-			fileName := p.savePath + "/" + p.fileDir + "/" + strconv.Itoa(count) + url[len(url)-4:]
+			
+			fileName := p.savePath + sep + p.fileDir + sep + strconv.Itoa(count) + url[len(url)-4:]
 			if ok, _ := pathExists(fileName); !ok {
 				file, err := os.Create(fileName)
 				if err != nil {
@@ -156,7 +171,7 @@ func (p *pixiv) downLoadImg(imgUrls chan string) {
 				if nn == 0 || err != nil {
 					p.log.WithError(err).Fatalf("Fail to write picture: %s", fileName)
 				}
-				p.log.Infoln(fileName + "save succeded")
+				p.log.Infoln(fileName + " save successfully")
 
 			}
 			mu := sync.Mutex{}
@@ -165,5 +180,6 @@ func (p *pixiv) downLoadImg(imgUrls chan string) {
 			mu.Unlock()
 		}(imgUrl, count)
 		wg.Wait()
+		p.log.Infof("Total: %d", count)
 	}
 }
