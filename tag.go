@@ -1,48 +1,61 @@
 package pixiv
 
 import (
-	"bufio"
 	"compress/gzip"
 	"fmt"
-	"io/ioutil"
-	"log"
+	"io"
 	"net/http"
-	"net/url"
-	"os"
-	"regexp"
 	"strconv"
-	"sync"
 
 	jsoniter "github.com/json-iterator/go"
 )
 
-const (
-	proxy = "http://127.0.0.1:10809"
-	imgPath = "C:/ELOI/pixiv/tag/"
-)
+type tag struct {
+	pixiv
+	tagName string
+}
 
-var (
-	proxyURL, _ = url.Parse(proxy)
-	trans = &http.Transport{
-		Proxy: http.ProxyURL(proxyURL),
-	}
-	client = &http.Client{
-		Transport: trans,
-	}
-)
+func Tag(tagName string) *tag {
+	t := new(tag)
+	t.savePath = globalConfig.GetString("download.tag.path")
+	t.fileDir = tagName
+	t.tagName = tagName
+	t.log = myLog.WithField("place", "tag")
+	return t
+}
 
-func getWorkId(tag string, pageUp int) (ids []string) {
-	var waitGroup sync.WaitGroup
-	for ;pageUp > 0; pageUp-- {
-		waitGroup.Add(1)
+func (t *tag) Num(num int) *tag {
+	t.num = num
+	return t
+}
+
+func (t *tag) Download() {
+	t.downLoadImg(t.getImgUrls(t.getIds()))
+}
+
+func (t *tag) getIds() chan string {
+	ids := make(chan string, t.num)
+	pageUp := t.num/60 + 1
+	numLeft := t.num % 60
+	pageCount := pageUp
+	// wait chan
+	idsChan := make(chan int)
+
+	URL := fmt.Sprintf(t.baseURL, t.tagName)
+	req, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		t.log.WithError(err).Fatalf("Fail to create request, URL=%s", URL)
+	}
+	setHeader(req)
+
+	for ; pageUp > 0; pageUp-- {
 		go func(pageUp int) {
-			req, err := http.NewRequest("GET", fmt.Sprintf("https://www.pixiv.net/ajax/search/artworks/%s", tag), nil)
-			if err != nil {
-				log.Fatalln("创建请求失败", err)
+			idNum := 60
+			if pageUp == pageCount {
+				idNum = numLeft
 			}
-			
 			q := req.URL.Query()
-			q.Add("word", tag)
+			q.Add("word", t.tagName)
 			q.Add("order", "date_d")
 			q.Add("mode", "all")
 			q.Add("p", strconv.Itoa(pageUp))
@@ -50,99 +63,34 @@ func getWorkId(tag string, pageUp int) (ids []string) {
 			q.Add("type", "all")
 			q.Add("lang", "zh")
 			req.URL.RawQuery = q.Encode()
-			
-			req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36")
-			req.Header.Set("Accept", "*/*")
-			req.Header.Set("Accept-Encoding", "gzip,deflate,br")
-			req.Header.Set("Connection", "keep-alive")
-			req.Header.Set("Referer", "https://www.pixiv.net/")
-			req.Header.Add("Accept-Charset","utf-8")
-
 			res, err := client.Do(req)
 			if err != nil {
-				log.Fatalln("客户端执行请求失败", err)
+				t.log.WithError(err).Fatalln("Fail to get response")
 			}
-			
+
+			if code := res.StatusCode; code != 200 {
+				t.log.Fatalf("URL Code=%d", res.StatusCode)
+			}
+
 			reader, _ := gzip.NewReader(res.Body)
-			content, err := ioutil.ReadAll(reader)
+			content, err := io.ReadAll(reader)
 			defer res.Body.Close()
 			if err != nil {
-				log.Fatalln("响应体读取失败", err)
-			}
-			
-			idNum := jsoniter.Get(content, "body").Get("illustManga").Get("data").Size()
-			if idNum == 0 {
-				log.Fatalln("获取data错误", err)
+				t.log.WithError(err).Fatalln("Fail to read response")
 			}
 
-			for ;idNum > 0; idNum-- {
-				ids = append(ids, jsoniter.Get(content, "body").Get("illustManga").Get("data", idNum-1).Get("id").ToString())
+			for ; idNum > 0; idNum-- {
+				ids <- jsoniter.Get(content, "body").Get("illustManga").Get("data", idNum-1).Get("id").ToString()
 			}
-			waitGroup.Done()
+			idsChan <- 1
 
-		}(pageUp)	
-		waitGroup.Wait()
+		}(pageUp)
 	}
-	log.Printf("作品总数为%d", len(ids))
-	return 
-}
-
-func getImgUrls(ids []string) (imgUrls []string) {
-	var wp sync.WaitGroup
-	for index, id := range(ids) {
-		log.Printf("尝试获取id为%s的作品", id)
-		wp.Add(1)
-		go func(id string) {
-			req, err := http.NewRequest("GET", fmt.Sprintf("https://www.pixiv.net/artworks/%s", id), nil)
-			if err != nil {
-				log.Fatalln("请求创建失败", err)
-			}
-
-			res, err := client.Do(req)
-			if err != nil {
-				log.Fatalln("无法得到响应", err)
-			}
-			if res.StatusCode != 200 {
-				log.Fatalf("请求错误， code=%d", res.StatusCode)
-			}	
-			defer res.Body.Close()
-
-			htmlByte, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				log.Fatalln("读取响应失败")
-			}
-			html := string(htmlByte)
-			
-			reg := regexp.MustCompile(`(?s)"original":"(.*?)"}`)
-			url := reg.FindStringSubmatch(html)[1]
-			if url == "" {
-				log.Fatalf("获取id为%s的imgurl失败", id)
-			}
-
-			log.Printf("====已获取到第%d张作品", index)
-			imgUrls = append(imgUrls, url)
-			wp.Done()
-		}(id)
-		wp.Wait()
-	}	
-	
-	log.Printf("图片url总数为%d", len(imgUrls))
-	return
-}
-
-
-func PathExists(path string) (bool, error) {
-    _, err := os.Stat(path)
-    if err == nil {
-        return true, nil
-    }
-    if os.IsNotExist(err) {
-        return false, nil
-    }
-    return false, err
-}
-
-func main() {
-	ids := getWorkId("R-18", 2)
-	downLoadImg(getImgUrls(ids), "R-18")
+	go func(pageCount int, idsChan chan int) {
+		for ; pageCount > 0; pageCount-- {
+			<-idsChan
+		}
+		close(ids)
+	}(pageCount, idsChan)
+	return ids
 }

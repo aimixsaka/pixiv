@@ -3,8 +3,14 @@ proxy:
   port: 10809
     
 download:
-  path: C:/ELOI/pixiv/keyname/
-  singlePath: C:/ELOI/pixiv/single/
+  single: 
+    path:
+  keyword:
+    path:
+  rank:
+    path:
+  tag:
+    path:
 
 upload:
   endPoint: 81.69.203.181:9000

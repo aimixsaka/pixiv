@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -12,9 +13,9 @@ import (
 var (
 	// global config
 	globalConfig *viper.Viper
-	
+
 	client *http.Client
-	myLog = &logrus.Logger{
+	myLog  = &logrus.Logger{
 		Level: logrus.DebugLevel,
 	}
 )
@@ -25,7 +26,6 @@ func init() {
 	initMinio()
 }
 
-
 func readConfig() {
 	globalConfig.SetConfigName("config")
 	globalConfig.SetConfigType("yaml")
@@ -35,7 +35,7 @@ func readConfig() {
 	myLog.Out = globalConfig.Get("logOutPut").(io.Writer)
 	err := globalConfig.ReadInConfig()
 	if err != nil {
-		myLog.WithField("place", "config").Errorf("read config file %s failed", "config.yaml Or config/*.yaml")	
+		myLog.WithField("place", "config").Errorf("read config file %s failed", "config.yaml Or config/*.yaml")
 	}
 }
 
@@ -47,7 +47,7 @@ func proxyConfig() {
 	if err != nil {
 		myLog.WithField("place", "config").Fatal("URL: [%s] Parse FAILED")
 	}
-	trans       := &http.Transport{
+	trans := &http.Transport{
 		Proxy: http.ProxyURL(proxyURL),
 	}
 	client = &http.Client{
