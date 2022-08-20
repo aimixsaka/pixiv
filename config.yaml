@@ -4,15 +4,15 @@ proxy:
     
 download:
   single: 
-    path: "C:\\ELOI\\pixiv\\single"
+    path: "C:\\xxxx\\pixiv\\sigle"
   keyword:
-    path: "C:\\ELOI\\pixiv\\keyname"
+    path: "C:\\xxxx\\pixiv\\keyname"
   rank:
-    path: "C:\\ELOI\\pixiv\\rank"
+    path: "C:\\xxxx\\pixiv\\rank"
   tag:
-    path: "C:\\ELOI\\pixiv\\tag"
+    path: "C:\\xxxx\\pixiv\\tag"
   user:
-    path: "C:\\ELOI\\pixiv\\user"
+    path: "C:\\xxxx\\pixiv\\user"
 
 upload:
   use: true 
