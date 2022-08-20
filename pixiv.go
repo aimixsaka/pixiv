@@ -75,9 +75,6 @@ func (p *pixiv) getImgUrls(ids chan string) chan string {
 	return imgUrls
 }
 
-// Now only support to upload to minio.
-// Default save path is bucket/pixiv/xxx, where
-// xxx is single/rank/tag ...
 func (p *pixiv) upLoadImg(imgUrls chan string) {
 	minioClient := initMinio()
 	bucketName := globalConfig.GetString("upload.bucketName")
