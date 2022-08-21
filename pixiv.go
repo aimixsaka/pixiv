@@ -128,7 +128,7 @@ func (p *pixiv) downLoadImg(imgUrls chan string) {
 		sep = "\\"	
 	}
 	if ok, _ := pathExists(p.savePath + sep + p.fileDir); !ok {
-		err := os.Mkdir(p.savePath + sep + p.fileDir, 0644)
+		err := os.Mkdir(p.savePath + sep + p.fileDir, 0766)
 		if err != nil {
 			p.log.WithError(err).Fatalf("Fail to create dir: %s", p.savePath+p.fileDir)
 		}
