@@ -81,7 +81,7 @@ func (p *pixiv) getImgUrls(ids chan string) chan string {
 func (p *pixiv) upLoadImg(imgUrls chan string) {
 	minioClient := initMinio()
 	bucketName := globalConfig.GetString("upload.bucketName")
-	fmt.Println(bucketName)
+	mu := sync.Mutex{}
 	var count int
 	var imgsCount int
 	imgsChan := make(chan int)
@@ -107,10 +107,9 @@ func (p *pixiv) upLoadImg(imgUrls chan string) {
 				p.log.WithError(err).Fatalln("Fail to upload to minio")
 			}
 			p.log.Infoln(name + "upload succeded")
-			lock := sync.Mutex{}
-			lock.Lock()
+			mu.Lock()
 			count++
-			lock.Unlock()
+			mu.Unlock()
 			imgsChan <- 1
 		}(imgUrl)
 	}
@@ -124,6 +123,7 @@ func (p *pixiv) downLoadImg(imgUrls chan string) {
 	var wg sync.WaitGroup
 	var count int
 	var sep string // seperator -depends on os(windows/linux)
+	mu := sync.Mutex{}
 	sysType := runtime.GOOS
 	if sysType == "linux" {
 		sep = "/"
@@ -174,7 +174,6 @@ func (p *pixiv) downLoadImg(imgUrls chan string) {
 				p.log.Infoln(fileName + " save successfully")
 
 			}
-			mu := sync.Mutex{}
 			mu.Lock()
 			count++
 			mu.Unlock()
