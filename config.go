@@ -1,8 +1,6 @@
 package pixiv
 
 import (
-	"bytes"
-	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -10,6 +8,7 @@ import (
 	"github.com/minio/minio-go"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+    "github.com/shiena/ansicolor"
 )
 
 var (
@@ -20,30 +19,20 @@ var (
 	myLog  = logrus.New()
 )
 
-type myFormatter struct {}
 
 func init() {
-	myLog.SetOutput(os.Stdout)
+	myLog.SetOutput(ansicolor.NewAnsiColorWriter(os.Stdout))
 	myLog.SetLevel(logrus.DebugLevel)
-	myLog.SetFormatter(&myFormatter{})
+	myLog.SetFormatter(&logrus.TextFormatter{
+		ForceColors: true,
+		ForceQuote:true,    
+		TimestampFormat:"2006-01-02 15:04:05",  
+		FullTimestamp:true,    
+	})
 	readConfig()
 	proxyConfig()
 }
 
-func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	var b *bytes.Buffer
-	if entry.Buffer != nil {
-		b = entry.Buffer
-	} else {
-		b = &bytes.Buffer{}
-	}
-	
-	timestamp := entry.Time.Format("2006-01-02 15:04:05")
-	newLog := fmt.Sprintf("[%s] [%s] %s\n", timestamp, entry.Level, entry.Message)
-
-	b.WriteString(newLog)
-	return b.Bytes(), nil
-}
 
 func readConfig() {
 	globalConfig.SetConfigName("config")
@@ -53,7 +42,7 @@ func readConfig() {
 	globalConfig.AddConfigPath("./config")
 	err := globalConfig.ReadInConfig()
 	if err != nil {
-		myLog.WithField("place", "config").WithError(err).Fatalf("read config file %s failed\n", "config.yaml Or config/*.yaml")
+		myLog.WithField("place", "config").WithError(err).Fatalf("read config file %s failed", "config.yaml Or config/*.yaml")
 	}
 }
 
@@ -63,7 +52,7 @@ func proxyConfig() {
 	rawURL := "http://" + proxyHost + ":" + proxyPort
 	proxyURL, err := url.Parse(rawURL)
 	if err != nil {
-		myLog.WithField("place", "config").Fatalf("URL: [%s] Parse FAILED\n", proxyURL)
+		myLog.WithField("place", "config").Fatalf("URL: [%s] Parse FAILED", proxyURL)
 	}
 	trans := &http.Transport{
 		Proxy: http.ProxyURL(proxyURL),
@@ -82,8 +71,8 @@ func initMinio() *minio.Client {
 		globalConfig.GetBool("useSSL"),
 	)
 	if err != nil {
-		myLog.WithField("place", "config").WithError(err).Fatal("Fail to Create minio Client, please check your config")
+		myLog.WithField("place", "config").WithError(err).Fatalln("Fail to Create minio Client, please check your config")
 	}
-	myLog.WithField("place", "config").Info("minio init successfully")
+	myLog.WithField("place", "config").Infoln("minio init successfully")
 	return client
 }

@@ -21,5 +21,4 @@ upload:
   secretAccessKey: xxxxxxxxxx
   useSSL: false
   bucketName: pixiv
-
   
