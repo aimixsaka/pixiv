@@ -15,7 +15,8 @@ type user struct {
 	userId string
 }
 
-// Constructor of userId of pictures.
+// User Constructor of userId of pictures.
+//
 // userId -id of the user.
 func User(userId string) *user {
 	u := new(user)
@@ -29,22 +30,26 @@ func User(userId string) *user {
 
 }
 
-// Set dir name.
+// Name Set dir name.
+//
 // Default is userid
 func (u *user) Name(name string) *user {
 	u.fileDir = name
 	return u
 }
 
+// Num num of pictures to get
 func (u *user) Num(num int) *user {
 	u.num = num
 	return u
 }
 
+// Download download pictures to loca
 func (u *user) Download() {
 	u.downLoadImg(u.getImgUrls(u.getIds()))
 }
 
+// Upload upload pictures to minio server
 func (u *user) Upload() {
 	u.upLoadImg(u.getImgUrls(u.getIds()))
 }

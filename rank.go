@@ -15,7 +15,7 @@ type rank struct {
 	cookie string
 }
 
-// Constructor of rank today.
+// Rank Constructor of rank today.
 func Rank() *rank {
 	r := new(rank)
 	r.rname = "rank"
@@ -25,14 +25,16 @@ func Rank() *rank {
 	return r
 }
 
-// Set cookie (necessary).
+// Cookie Set cookie (necessary).
+// 
 // cookie -cookie in request header.
 func (r *rank) Cookie(cookie string) *rank {
 	r.cookie = cookie
 	return r
 }
 
-// Num of picture to get.
+// Num num of picture to get.
+//
 // default 100
 func (r *rank) Num(num int) *rank {
 	if r.cookie == "" {

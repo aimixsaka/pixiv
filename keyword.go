@@ -15,7 +15,8 @@ type keyWord struct {
 	keyWord string
 }
 
-// Constructor of keyword of pictures
+// KeyWord Constructor of keyword of pictures.
+//
 // word -keyword to search.
 func KeyWord(word string) *keyWord {
 	k := new(keyWord)
@@ -28,7 +29,7 @@ func KeyWord(word string) *keyWord {
 	return k
 }
 
-// Set num of pictures.
+// Num Set num of pictures.
 func (k *keyWord) Num(num int) *keyWord {
 	if num <= 0 {
 		k.log.Fatalln("Please give a number > 0")

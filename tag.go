@@ -15,7 +15,8 @@ type tag struct {
 	tagName string
 }
 
-// Constructor of tag of pictures.
+// Tag Constructor of tag of pictures.
+//
 // tagName -name of tag, can't be multi.
 func Tag(tagName string) *tag {
 	t := new(tag)
@@ -28,15 +29,18 @@ func Tag(tagName string) *tag {
 	return t
 }
 
+// Num num of pictures to get.
 func (t *tag) Num(num int) *tag {
 	t.num = num
 	return t
 }
 
+// Download download pictures to local
 func (t *tag) Download() {
 	t.downLoadImg(t.getImgUrls(t.getIds()))
 }
 
+// Upload upload pictures to minio server
 func (t *tag) Upload() {
 	t.upLoadImg(t.getImgUrls(t.getIds()))
 }

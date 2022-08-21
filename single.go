@@ -5,7 +5,8 @@ type single struct {
 	workId chan string
 }
 
-// Constructor of single picture.
+// Single Constructor of single picture.
+//
 // workId -the id of the single picture.
 func Single(workId string) *single {
 	s := new(single)
@@ -22,7 +23,8 @@ func Single(workId string) *single {
 	return s
 }
 
-// Set single dir name.
+// Name Set single dir name.
+//
 // Default is single
 func (s *single) Name(dirName string) *single {
 	s.fileDir = dirName

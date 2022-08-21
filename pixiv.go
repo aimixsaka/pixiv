@@ -1,3 +1,6 @@
+// Package pixiv
+//
+// a pixiv spider in go
 package pixiv
 
 import (
