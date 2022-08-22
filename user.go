@@ -40,17 +40,26 @@ func (u *user) Name(name string) *user {
 
 // Num num of pictures to get
 func (u *user) Num(num int) *user {
+	if num <= 0 {
+		u.log.Fatalln("Please give a number > 0")
+	}
 	u.num = num
 	return u
 }
 
 // Download download pictures to loca
 func (u *user) Download() {
+	if u.num == 0 {
+		u.log.Fatalln("Please set num before download")
+	}
 	u.downLoadImg(u.getImgUrls(u.getIds()))
 }
 
 // Upload upload pictures to minio server
 func (u *user) Upload() {
+	if u.num == 0 {
+		u.log.Fatalln("Please set num before download")
+	}
 	u.upLoadImg(u.getImgUrls(u.getIds()))
 }
 
