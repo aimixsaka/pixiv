@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"unsafe"
 
 	jsoniter "github.com/json-iterator/go"
@@ -123,8 +124,13 @@ func (r *rank) getCookie() string {
 	cookieFile := "cookie.txt"
 	cookieByte, err := os.ReadFile(cookieFile)
 	if err != nil {
-		r.log.WithError(err).Fatalln("Fail to read cookie.txt")	
+		cookieFile = "../cookie.txt"
+		cookieByte, err = os.ReadFile(cookieFile)
+		if err != nil {
+			r.log.WithError(err).Fatalln("Fail to read cookie.txt")	
+		}
 	}
 	cookie := *(*string)(unsafe.Pointer(&cookieByte))
+	cookie = strings.TrimSpace(cookie)
 	return cookie
 }
