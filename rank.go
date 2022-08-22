@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"unsafe"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -22,6 +24,7 @@ func Rank() *rank {
 	r.log = myLog.WithField("place", "rank")
 	r.baseURL = "https://www.pixiv.net/ajax/top/illust"
 	r.savePath = globalConfig.GetString("download.rank.path")
+	r.cookie = r.getCookie()
 	return r
 }
 
@@ -114,4 +117,14 @@ func (r *rank) getIds() chan string {
 	}()
 
 	return ids
+}
+
+func (r *rank) getCookie() string {
+	cookieFile := "cookie.txt"
+	cookieByte, err := os.ReadFile(cookieFile)
+	if err != nil {
+		r.log.WithError(err).Fatalln("Fail to read cookie.txt")	
+	}
+	cookie := *(*string)(unsafe.Pointer(&cookieByte))
+	return cookie
 }
