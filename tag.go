@@ -31,17 +31,26 @@ func Tag(tagName string) *tag {
 
 // Num num of pictures to get.
 func (t *tag) Num(num int) *tag {
+	if num <= 0 {
+		t.log.Fatalln("Please give a number > 0")
+	}
 	t.num = num
 	return t
 }
 
 // Download download pictures to local
 func (t *tag) Download() {
+	if t.num == 0 {
+		t.log.Fatalln("Please set num before download")
+	}
 	t.downLoadImg(t.getImgUrls(t.getIds()))
 }
 
 // Upload upload pictures to minio server
 func (t *tag) Upload() {
+	if t.num == 0 {
+		t.log.Fatalln("Please set num before download")
+	}
 	t.upLoadImg(t.getImgUrls(t.getIds()))
 }
 
