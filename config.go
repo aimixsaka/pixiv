@@ -21,6 +21,12 @@ var (
 
 
 func init() {
+	initLog()
+	readConfig()
+	proxyConfig()
+}
+
+func initLog() {
 	myLog.SetOutput(ansicolor.NewAnsiColorWriter(os.Stdout))
 	myLog.SetLevel(logrus.DebugLevel)
 	myLog.SetFormatter(&logrus.TextFormatter{
@@ -29,10 +35,7 @@ func init() {
 		TimestampFormat:"2006-01-02 15:04:05",  
 		FullTimestamp:true,    
 	})
-	readConfig()
-	proxyConfig()
 }
-
 
 func readConfig() {
 	globalConfig.SetConfigName("config")
