@@ -6,6 +6,8 @@ go 实现的pixiv爬虫
 
 您需要在项目根目录中添加一个 `config.yaml` 来配置代理，下载等
 
+(注：如果您需要使用`Rank()`， 请在项目根目录中新建一个`cookie.txt`，并将request的cookie复制至其中)
+
 例子：
 ```yaml
 proxy:

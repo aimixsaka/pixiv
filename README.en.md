@@ -6,6 +6,8 @@ Use `go mod init xxx` to init your module, then use `go install github.com/yfaim
 
 You need to add a `config.yaml` in your project root to config `proxy`, `download` ...
 
+(Note: If you need `Rank()` function, you need to paste your cookie into `cookie.txt`)
+
 Example:
 ```yaml
 proxy:
