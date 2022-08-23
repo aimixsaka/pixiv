@@ -9,8 +9,8 @@ You need to add a `config.yaml` in your project root to config `proxy`, `downloa
 Example:
 ```yaml
 proxy:
-  host: 127.0.0.1
-  port: 10809
+  host: xxx.xxx.xxx.xxx
+  port: xxxx
     
 download:
   single: 

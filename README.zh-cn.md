@@ -9,8 +9,8 @@ go 实现的pixiv爬虫
 例子：
 ```yaml
 proxy:
-  host: 127.0.0.1
-  port: 10809
+  host: xxx.xxx.xx.xx
+  port: xxxx
     
 download:
   single: 
