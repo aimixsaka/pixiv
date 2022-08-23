@@ -2,15 +2,17 @@
 **A go pixiv spider**
 
 ### Before
-Use `go mod init xxx` to init your module, then use `go get github.com/yfaimisaka/pixiv@v0.1.0` to add it to your module.
+Use `go mod init xxx` to init your module, then use `go install github.com/yfaimisaka/pixiv@latest` to add it to your module.
 
 You need to add a `config.yaml` in your project root to config `proxy`, `download` ...
+
+(Note: If you need `Rank()` function, you need to paste your cookie into `cookie.txt`)
 
 Example:
 ```yaml
 proxy:
-  host: 127.0.0.1
-  port: 10809
+  host: xxx.xxx.xxx.xxx
+  port: xxxx
     
 download:
   single: 

@@ -2,15 +2,17 @@
 go 实现的pixiv爬虫
 
 ## Before
-先初始化您的module，然后在module中使用 `go get github.com/yfaimisaka/pixiv@v0.1.0` 来获取它
+先初始化您的module，然后在module中使用 `go install github.com/yfaimisaka/pixiv@latest` 来获取它
 
 您需要在项目根目录中添加一个 `config.yaml` 来配置代理，下载等
+
+(注：如果您需要使用`Rank()`， 请在项目根目录中新建一个`cookie.txt`，并将request的cookie复制至其中)
 
 例子：
 ```yaml
 proxy:
-  host: 127.0.0.1
-  port: 10809
+  host: xxx.xxx.xx.xx
+  port: xxxx
     
 download:
   single: 
