@@ -66,21 +66,19 @@ func (r *rank) Upload() {
 	if r.num == 0 {
 		r.num = 100
 	}
+	if r.num > 49 {
+		r.log.Fatalln("Please give a number < 50, it's better")
+	}
 	r.upLoadImg(r.getImgUrls(r.getIds()))
 }
 
 func (r *rank) getIds() chan string {
 	ids := make(chan string)
 	req, err := http.NewRequest("GET", r.baseURL, nil)
+
 	if err != nil {
 		r.log.WithError(err).Fatalf("Fail to create request, URL=%s", r.baseURL)
 	}
-
-	// q := req.URL.Query()
-	// q.Add("mode", "monthly")
-	// q.Add("p", "1")
-	// q.Add("format", "json")
-	// req.URL.RawQuery = q.Encode()
 
 	setHeader(req)
 	req.Header.Set("cookie", r.cookie)
