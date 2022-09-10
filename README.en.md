@@ -57,7 +57,7 @@ pixiv.KeyWord("灼眼のシャナ").Num(10).Upload() // upload 10 keyword pictur
 ```
 
 #### Rank()
-> get today's rank
+> get month rank
 
 Sample:
 ```go
