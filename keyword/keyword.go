@@ -1,4 +1,4 @@
-package pixiv
+package keyword
 
 import (
 	"compress/gzip"
@@ -8,10 +8,11 @@ import (
 	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/yfaimisaka/pixiv"
 )
 
 type keyWord struct {
-	pixiv
+	pixiv.Pixiv	
 	keyWord string
 }
 

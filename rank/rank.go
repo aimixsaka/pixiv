@@ -1,4 +1,4 @@
-package pixiv
+package rank
 
 import (
 	"compress/gzip"
@@ -11,10 +11,11 @@ import (
 	"unsafe"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/yfaimisaka/pixiv"
 )
 
 type rank struct {
-	pixiv
+	pixiv.Pixiv
 	num int
 	cookie string
 }

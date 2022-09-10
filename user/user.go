@@ -1,4 +1,4 @@
-package pixiv
+package user
 
 import (
 	"compress/gzip"
@@ -8,10 +8,11 @@ import (
 	"net/http"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/yfaimisaka/pixiv"
 )
 
 type user struct {
-	pixiv
+	pixiv.Pixiv
 	userId string
 }
 

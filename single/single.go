@@ -1,7 +1,9 @@
-package pixiv
+package single
+
+import "github.com/yfaimisaka/pixiv"
 
 type single struct {
-	pixiv
+	pixiv.Pixiv
 	workId chan string
 }
 

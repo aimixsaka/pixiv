@@ -1,4 +1,4 @@
-package pixiv
+package tag
 
 import (
 	"compress/gzip"
@@ -8,10 +8,11 @@ import (
 	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/yfaimisaka/pixiv"
 )
 
 type tag struct {
-	pixiv
+	pixiv.Pixiv
 	tagName string
 }
 
