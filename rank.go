@@ -2,11 +2,12 @@ package pixiv
 
 import (
 	"compress/gzip"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 	"unsafe"
 
 	jsoniter "github.com/json-iterator/go"
@@ -18,12 +19,12 @@ type rank struct {
 	cookie string
 }
 
-// Rank Constructor of rank today.
+// Rank Constructor of rank per month.
 func Rank() *rank {
 	r := new(rank)
 	r.rname = "rank"
 	r.log = myLog.WithField("place", "rank")
-	r.baseURL = "https://www.pixiv.net/ajax/top/illust"
+	r.baseURL = "https://www.pixiv.net/ranking.php?mode=monthly&p=1&format=json"
 	r.savePath = globalConfig.GetString("download.rank.path")
 	r.cookie = r.getCookie()
 	return r
@@ -75,10 +76,11 @@ func (r *rank) getIds() chan string {
 		r.log.WithError(err).Fatalf("Fail to create request, URL=%s", r.baseURL)
 	}
 
-	q := req.URL.Query()
-	q.Add("mode", "all")
-	q.Add("lang", "zh")
-	req.URL.RawQuery = q.Encode()
+	// q := req.URL.Query()
+	// q.Add("mode", "monthly")
+	// q.Add("p", "1")
+	// q.Add("format", "json")
+	// req.URL.RawQuery = q.Encode()
 
 	setHeader(req)
 	req.Header.Set("cookie", r.cookie)
@@ -102,17 +104,13 @@ func (r *rank) getIds() chan string {
 		r.log.WithError(err).Fatalln("Fail to read response")
 	}
 
-	rankDate := jsoniter.Get(content, "body").Get("page").Get("ranking").Get("date").ToString()
-	if rankDate == "" {
-		log.Fatalln("Fail to get today's rank date")
-	}
-
+	rankDate := fmt.Sprintf("%d%d%d", time.Now().Year(), time.Now().Month(), time.Now().Day())
 	r.log.Infof("Rank date is: %s\n", rankDate)
 	r.fileDir = rankDate
-
+	contents := jsoniter.Get(content, "contents")
 	go func() {
 		for s := 0; s < r.num; s++ {
-			ids <- jsoniter.Get(content, "body").Get("page").Get("ranking").Get("items", s).Get("id").ToString()
+			ids <- contents.Get(s).Get("illust_id").ToString()
 		}
 		close(ids)
 	}()

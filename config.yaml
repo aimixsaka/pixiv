@@ -1,0 +1,23 @@
+proxy:
+  host: xxxxxxxxxx
+  port: xxxxxx
+    
+download:
+  single: 
+    path: "xxxxxxxxxxx"
+  keyword:
+    path: "xxxxxxxxxxx"
+  rank:
+    path: "xxxxxxxxxxx"
+  tag:
+    path: ":xxxxxxxxxx"
+  user:
+    path: "xxxxxxxxxxx"
+
+upload:
+  use: true 
+  endPoint: xxxxxxxxxxxxx:9000
+  accessKeyID: xxxxxxxxxx
+  secretAccessKey: xxxxxxxxxx
+  useSSL: false
+  bucketName: pixiv
