@@ -57,7 +57,7 @@ pixiv.KeyWord("灼眼のシャナ").Num(10).Download() //在关键词上下载10
 pixiv.KeyWord("灼眼のシャナ").Num(10).Upload() // 上传10张关键词图片到你的minio服务器
 ```
 #### Rank()
-> 获得今天的排名
+> 获得今月的排名
 
 样例：
 ```go
