@@ -2,24 +2,13 @@ module github.com/yfaimisaka/pixiv
 
 go 1.19
 
-require (
-	github.com/json-iterator/go v1.1.12
-	github.com/minio/minio-go/v6 v6.0.57
-	gorm.io/driver/mysql v1.3.6
-	gorm.io/gorm v1.23.8
-)
+require github.com/json-iterator/go v1.1.12
 
 require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/klauspost/cpuid v1.2.3 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
-	github.com/minio/md5-simd v1.1.0 // indirect
-	github.com/minio/sha256-simd v0.1.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
