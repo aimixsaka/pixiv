@@ -3,6 +3,6 @@
 
 - `TODO LIST`
 1. - [ ] improve log
-2. - [ ] improve error hanling
+2. - [ ] improve error handling
 3. - [ ] check data race
 
